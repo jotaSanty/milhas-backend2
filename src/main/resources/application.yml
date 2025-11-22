@@ -1,0 +1,30 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/milhasdb}
+    username: ${SPRING_DATASOURCE_USERNAME:milhas}
+    password: ${SPRING_DATASOURCE_PASSWORD:milhaspass}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+
+app:
+  jwt:
+    secret: ${APP_JWT_SECRET:very-very-very-long-default-secret-change-this-please-0123456789}
+    expiration-ms: ${APP_JWT_EXPIRATION_MS:86400000}
+  file:
+    upload-dir: ${APP_UPLOAD_DIR:./uploads}
+
+logging:
+  level:
+    root: INFO
