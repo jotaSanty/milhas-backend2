@@ -1,5 +1,6 @@
 package com.milhas.service;
 
+import com.milhas.entity.User; // Importação necessária
 import com.milhas.security.JwtProvider;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,8 @@ public class AuthService {
     }
 
     public Optional<String> login(String email, String rawPassword) {
-        var uOpt = userService.findByEmail(email);
+        // CORREÇÃO: 'var' trocado por 'Optional<User>'
+        Optional<User> uOpt = userService.findByEmail(email);
         if (uOpt.isPresent() && encoder.matches(rawPassword, uOpt.get().getPassword())) {
             return Optional.of(jwtProvider.generateToken(email));
         }

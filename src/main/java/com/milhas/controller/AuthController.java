@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.Optional; // Adicionado
 
 @RestController
 @RequestMapping("/api/auth")
@@ -31,17 +32,27 @@ public class AuthController {
         if (userService.findByEmail(user.getEmail()).isPresent()) {
             return ResponseEntity.badRequest().body(Map.of("error", "Email already in use"));
         }
-        var created = userService.createUser(user);
+
+        // --- ADICIONE ESTAS LINHAS ---
+        // Pega a senha original, criptografa com o encoder e define de volta no usuário
+        String passwordCriptografada = encoder.encode(user.getPassword());
+        user.setPassword(passwordCriptografada);
+        // -----------------------------
+
+        User created = userService.createUser(user);
         String token = jwtProvider.generateToken(created.getEmail());
+
         return ResponseEntity.ok(Map.of("token", token, "user", created));
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> body) {
-        var email = body.get("email");
-        var pass = body.get("password");
-        var opt = authService.login(email, pass);
+        // CORREÇÃO: 'var' trocado por 'String'
+        String email = body.get("email");
+        String pass = body.get("password");
+        // CORREÇÃO: 'var' trocado por 'Optional<String>'
+        Optional<String> opt = authService.login(email, pass);
         return opt.map(t -> ResponseEntity.ok(Map.of("token", t)))
-                  .orElseGet(() -> ResponseEntity.status(401).body(Map.of("error", "Invalid credentials")));
+                .orElseGet(() -> ResponseEntity.status(401).body(Map.of("error", "Invalid credentials")));
     }
 }

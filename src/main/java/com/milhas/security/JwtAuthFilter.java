@@ -1,15 +1,18 @@
 package com.milhas.security;
 
+import com.milhas.entity.User; // Importação que faltava
+import com.milhas.service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import com.milhas.service.UserService;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
+
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Optional; // Importação que faltava
 
 public class JwtAuthFilter extends OncePerRequestFilter {
 
@@ -30,10 +33,17 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             String token = header.substring(7);
             if (jwtProvider.validateToken(token)) {
                 String email = jwtProvider.getSubject(token);
-                var userOpt = userService.findByEmail(email);
+
+                // CORREÇÃO: 'var' substituído por 'Optional<User>'
+                Optional<User> userOpt = userService.findByEmail(email);
+
                 if (userOpt.isPresent()) {
-                    var user = userOpt.get();
-                    var auth = new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList());
+                    // CORREÇÃO: 'var' substituído por 'User'
+                    User user = userOpt.get();
+
+                    // CORREÇÃO: 'var' substituído por 'UsernamePasswordAuthenticationToken'
+                    UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList());
+
                     SecurityContextHolder.getContext().setAuthentication(auth);
                 }
             }

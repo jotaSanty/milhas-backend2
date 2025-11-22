@@ -25,7 +25,7 @@ public class FileController {
     @GetMapping("/{id}")
     public ResponseEntity<?> download(@PathVariable Long id) {
         Optional<Attachment> a = attachmentRepository.findById(id);
-        if (a.isEmpty()) return ResponseEntity.notFound().build();
+        if (!a.isPresent()) return ResponseEntity.notFound().build();
         Path p = fileStorageService.loadAsPath(a.get().getUrl());
         return ResponseEntity.ok().body(new PathResource(p));
     }
